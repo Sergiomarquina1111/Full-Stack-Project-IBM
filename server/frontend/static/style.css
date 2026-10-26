@@ -1,0 +1,19 @@
+* { box-sizing: border-box; }
+body { margin: 0; font-family: Arial, Helvetica, sans-serif; color: #222; background: #f5f7fa; line-height: 1.5; }
+header { background: #1f3a5f; color: #fff; }
+.nav { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; padding: 12px 24px; }
+.nav .brand { font-weight: bold; font-size: 1.3rem; }
+.nav ul { list-style: none; display: flex; gap: 18px; margin: 0; padding: 0; flex-wrap: wrap; }
+.nav a { color: #fff; text-decoration: none; padding: 6px 10px; border-radius: 4px; }
+.nav a:hover { background: #2d5282; }
+.nav a.active { background: #f0a500; color: #1f1f1f; font-weight: bold; }
+.banner { width: 100%; max-height: 240px; object-fit: cover; display: block; }
+main { max-width: 1100px; margin: 0 auto; padding: 24px; }
+h1, h2 { color: #1f3a5f; }
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; }
+.card { background: #fff; border-radius: 8px; padding: 16px; box-shadow: 0 2px 6px rgba(0,0,0,0.08); text-align: center; }
+.card img { width: 100%; height: 200px; object-fit: cover; border-radius: 6px; }
+.card .role { color: #555; font-style: italic; }
+.contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+footer { text-align: center; padding: 16px; background: #1f3a5f; color: #fff; margin-top: 24px; }
+@media (max-width: 700px) { .contact-grid { grid-template-columns: 1fr; } }

@@ -1,83 +1,38 @@
-from cloudant.client import Cloudant
-from cloudant.query import Query
-from flask import Flask, jsonify, request
-import atexit
+"""IBM Cloud Function (Python): dealer reviews microservice.
+
+Actions:
+  {"action": "get_reviews", "dealerId": 1}
+  {"action": "post_review", "review": {...}}
+"""
 import json
+import os
 
-# TODO: Enter Your Creditentials
-#Add your Cloudant service credentials here
-cloudant_username = 'ENTER_YOUR_CLOUDANT_USERNAME'
-cloudant_api_key = 'ENTER_YOUR_IAM_API_KEY'
-cloudant_url = 'ENTER_YOUR_CLOUDANT_URL'
-client = Cloudant.iam(cloudant_username, cloudant_api_key, connect=True, url=cloudant_url)
-
-session = client.session()
-print('Databases:', client.all_dbs())
-
-db = client['reviews']
-
-app = Flask(__name__)
-
-@app.route('/api/get_reviews', methods=['GET'])
-def get_reviews():
-    dealership_id = request.args.get('id')
-
-    # Check if "id" parameter is missing
-    if dealership_id is None:
-        return jsonify({"error": "Missing 'id' parameter in the URL"}), 400
-
-    # Convert the "id" parameter to an integer (assuming "id" should be an integer)
-    try:
-        dealership_id = int(dealership_id)
-    except ValueError:
-        return jsonify({"error": "'id' parameter must be an integer"}), 400
-
-    # Define the query based on the 'dealership' ID
-    selector = {
-        'dealership': dealership_id
-    }
-
-    # Execute the query using the query method
-    result = db.get_query_result(selector)
-
-    # Create a list to store the documents
-    data_list = []
-
-    # Iterate through the results and add documents to the list
-    for doc in result:
-        data_list.append(doc)
-
-    # Return the data as JSON
-    return jsonify(data_list)
+DATA = os.path.join(os.path.dirname(__file__), "..", "cloudant", "data", "reviews.json")
 
 
-@app.route('/api/post_review', methods=['POST'])
-def post_review():
-    if not request.json:
-        abort(400, description='Invalid JSON data')
-    
-    # Extract review data from the request JSON
-    review_data = request.json
+def _load():
+    with open(DATA, encoding="utf-8") as f:
+        return json.load(f)["reviews"]
 
-    # Validate that the required fields are present in the review data
-    required_fields = ['id', 'name', 'dealership', 'review', 'purchase', 'purchase_date', 'car_make', 'car_model', 'car_year']
-    for field in required_fields:
-        if field not in review_data:
-            jsonify(400, {"description":f'Missing required field: {field}'})
 
-    # Save the review data as a new document in the Cloudant database
-    # Temprory solution for case: If direct submission of reveiw from flask server.
-    print(review_data)
-    temp = {}
-    if(type(review_data) == type(temp)):
-        db.create_document(review_data)
-        return jsonify({"message": "Review posted successfully"}), 201
-        
-        
-    # Review submission via post request from django server
-    print(review_data["review"])
-    db.create_document(review_data["review"])
-    return jsonify({"message": "Review posted successfully"}), 201
+def _save(reviews):
+    with open(DATA, "w", encoding="utf-8") as f:
+        json.dump({"reviews": reviews}, f, indent=2)
 
-if __name__ == '__main__':
-    app.run(debug=True)
+
+def main(params):
+    action = params.get("action", "get_reviews")
+    if action == "get_reviews":
+        dealer_id = int(params.get("dealerId", 0))
+        result = [r for r in _load() if int(r.get("dealership", -1)) == dealer_id]
+        return {"statusCode": 200, "body": {"entries": result}}
+
+    if action == "post_review":
+        reviews = _load()
+        review = params.get("review", {})
+        review["id"] = max([r["id"] for r in reviews] or [0]) + 1
+        reviews.append(review)
+        _save(reviews)
+        return {"statusCode": 200, "body": review}
+
+    return {"statusCode": 400, "body": {"error": f"unknown action {action}"}}

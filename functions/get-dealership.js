@@ -1,66 +1,25 @@
-const express = require("express");
-const app = express();
-const port = process.env.PORT || 3000;
-const Cloudant = require("@cloudant/cloudant");
+// IBM Cloud Function: returns dealerships, optionally filtered by state or id.
+// Params: { state?: "Kansas", dealerId?: 1 }
+const fs = require("fs");
+const path = require("path");
 
-// Initialize Cloudant connection with IAM authentication
-// TODO: Get the creditential from your ibm cloudant db and fill here
-async function dbCloudantConnect() {
-  try {
-    const cloudant = Cloudant({
-      plugins: { iamauth: { iamApiKey: "ENTER_YOUR_IAM_API_KEY" } }, // Replace with your IAM API key
-      url: "ENTER_YOUR_CLOUDANT_URL", // Replace with your Cloudant URL
-    });
-
-    const db = cloudant.use("dealerships");
-    console.info("Connect success! Connected to DB");
-    return db;
-  } catch (err) {
-    console.error("Connect failure: " + err.message + " for Cloudant DB");
-    throw err;
-  }
+function loadDealers() {
+  const file = path.join(__dirname, "..", "cloudant", "data", "dealerships.json");
+  const data = JSON.parse(fs.readFileSync(file, "utf8"));
+  return data.dealerships;
 }
 
-let db;
-
-(async () => {
-  db = await dbCloudantConnect();
-})();
-
-app.use(express.json());
-
-// Define a route to get all dealerships with optional state and ID filters
-app.get("/dealerships/get", (req, res) => {
-  const { state, id } = req.query;
-  console.log(req.query);
-  // Create a selector object based on query parameters
-  const selector = {};
-  if (state) {
-    selector.state = state;
+function main(params = {}) {
+  let dealers = loadDealers();
+  if (params.dealerId !== undefined) {
+    dealers = dealers.filter((d) => String(d.id) === String(params.dealerId));
+    return { statusCode: 200, body: { entries: dealers } };
   }
-
-  if (id) {
-    selector.id = parseInt(id); // Filter by "id" with a value of 1
+  if (params.state) {
+    const s = String(params.state).toLowerCase();
+    dealers = dealers.filter((d) => d.state.toLowerCase() === s || d.st.toLowerCase() === s);
   }
+  return { statusCode: 200, body: { entries: dealers } };
+}
 
-  const queryOptions = {
-    selector,
-    limit: 10, // Limit the number of documents returned to 10
-  };
-
-  db.find(queryOptions, (err, body) => {
-    if (err) {
-      console.error("Error fetching dealerships:", err);
-      res
-        .status(500)
-        .json({ error: "An error occurred while fetching dealerships." });
-    } else {
-      const dealerships = body.docs;
-      res.json(dealerships);
-    }
-  });
-});
-
-app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
-});
+module.exports = { main };

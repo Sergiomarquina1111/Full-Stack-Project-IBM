@@ -1,0 +1,27 @@
+body { margin: 0; font-family: Arial, Helvetica, sans-serif; background: #f5f7fa; color: #222; }
+.navbar { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; padding: 12px 24px; background: #1f3a5f; color: #fff; }
+.navbar a { color: #fff; text-decoration: none; padding: 6px 10px; border-radius: 4px; }
+.navbar a:hover { background: #2d5282; }
+.navbar .brand { font-weight: bold; font-size: 1.2rem; }
+.nav-links { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.welcome { margin: 0 8px; }
+.content { max-width: 1100px; margin: 0 auto; padding: 24px; }
+h1, h2 { color: #1f3a5f; }
+table.dealer-table { width: 100%; border-collapse: collapse; background: #fff; }
+table.dealer-table th, table.dealer-table td { padding: 10px; border-bottom: 1px solid #e2e8f0; text-align: left; }
+table.dealer-table th { background: #1f3a5f; color: #fff; }
+.filter { margin-bottom: 16px; }
+select, input, textarea { padding: 8px; border: 1px solid #cbd5e0; border-radius: 4px; font-size: 1rem; width: 100%; max-width: 420px; }
+.form { background: #fff; padding: 20px; border-radius: 8px; max-width: 460px; box-shadow: 0 2px 6px rgba(0,0,0,0.08); }
+.form label { display: block; margin-top: 12px; font-weight: bold; }
+.btn { background: #1f3a5f; color: #fff; border: none; padding: 10px 18px; border-radius: 4px; cursor: pointer; margin-top: 16px; font-size: 1rem; }
+.btn:hover { background: #2d5282; }
+.btn-small { background: #f0a500; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; }
+.error { color: #c53030; }
+.success { color: #2f855a; }
+.review-card { background: #fff; border-radius: 8px; padding: 14px; margin-bottom: 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+.badge { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 0.85rem; color: #fff; }
+.badge.positive { background: #2f855a; }
+.badge.negative { background: #c53030; }
+.badge.neutral { background: #718096; }
+@media (max-width: 600px) { .navbar { flex-direction: column; gap: 8px; } table.dealer-table { font-size: 0.9rem; } }
