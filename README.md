@@ -1,4 +1,8 @@
-# Cars Dealership – Full-Stack Capstone
+# Full-Stack-Project-IBM
+
+## Dealership Review Portal
+
+A full-stack web application for car dealership reviews built with Django, React, Node.js, and IBM Cloud services.
 
 A responsive web application for **Cars Dealership**, a national car retailer. Users can browse dealership
 branches, filter them by state, read dealer reviews with sentiment labels, and (after logging in) submit
